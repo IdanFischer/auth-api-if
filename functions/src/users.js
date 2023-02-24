@@ -4,6 +4,10 @@ import { secret_key } from "../service_account.js";
 
 export function signup(req, res) {
   const { email, password } = req.body
+  if(email.length < 6 || password.length < 1) {
+    res.status(403).send({message: "invalid request"})
+    return
+  }
   const newUser = {
     email: email.toLowerCase(),
     password: password
@@ -42,12 +46,14 @@ export function login(req, res) {
     }
     let user = users[0]
     user.password = undefined
+    // making the jwt token
     const token = jwt.sign(user, secret_key)
+    // now sending it back
     res.status(200).send({ user, token })
-    .catch(err => {
-      res.status(500).send({success: false, message: err.message})
-    })
-
+    
+  })
+  .catch(err => {
+    res.status(500).send({success: false, message: err.message})
   })
 }
 
